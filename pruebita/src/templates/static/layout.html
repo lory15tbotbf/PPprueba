@@ -31,9 +31,11 @@
 				{% if not g.user %}
                 <li><a href="{{ url_for('login') }}">Login</a></li>
 				{% else %}
-                <li><a href="{{ url_for('add') }}">Add</a></li>
+                <li><a href="{{ url_for('add') }}">Admin</a></li>
+                <li><a href="{{ url_for('add') }}">Gestion</a></li>
+                <li><a href="{{ url_for('add') }}">Desarrollo</a></li>
                 <li><a href="{{ url_for('logout') }}">Logout</a></li>
-				{% endif %}
+                		{% endif %}
             </ul>
         </div>
         <div id="navbarright"></div>
@@ -51,9 +53,11 @@
 						{% if not g.user %}
                         <li><a href="{{ url_for('login') }}">Login</a></li>
 						{% else %}
-                        <li><a href="{{ url_for('add') }}">Add</a></li>
+                        <li><a href="{{ url_for('add') }}">Admin</a></li>
+                        <li><a href="{{ url_for('add') }}">Gestion</a></li>
+                        <li><a href="{{ url_for('add') }}">Desarrollo</a></li>
                         <li><a href="{{ url_for('logout') }}">Logout</a></li>
-						{% endif %}
+                        			{% endif %}
                     </ul>
                     {% endblock %}
                 </li>

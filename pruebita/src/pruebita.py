@@ -1,13 +1,6 @@
 # To change this template, choose Tools | Templates
 # and open the template in the editor.
 
-"""
-FlaskBlog
-~~~~~~~~~~~~~~
-:copyright: (c) 2011 by Oscar M. Lage.
-:license: BSD, see LICENSE for more details.
-"""
-
 #------------------------------------------------------------------------------#
 # IMPORTS
 #------------------------------------------------------------------------------#
@@ -104,7 +97,7 @@ class CreateForm(Form):
 # Login form
 class LoginForm(Form):
     """Form used to login into the system"""
-    username = TextField('Username', [validators.required()])
+    username = TextField('Nick', [validators.required()])
     password = PasswordField('Password', [validators.required()])
 
 
@@ -184,13 +177,13 @@ def login():
             u = User.query.filter(User.name == request.form['username'], 
                                   User.passwd == request.form['password']).first()
             if u is None:
-                error = 'Invalid username or password.'
+                error = 'Nick o Password incorrecto.'
             else:
                 print u.id
                 session['logged_in'] = True
                 session['user_id'] = u.id
                 session['user_name'] = u.name
-                flash('You were logged in')
+                flash('Usted se ha conectado')
                 return redirect(url_for('index'))
             
         return render_template(app.config['DEFAULT_TPL']+'/login.html',
@@ -207,7 +200,7 @@ def logout():
         session.pop('logged_in', None)
         session.pop('user_id', None)
         session.pop('user_name', None)
-        flash('You were logged out')
+        flash('Usted se ha desconectado')
     return redirect(url_for('index'))
 
 #------------------------------------------------------------------------------#
