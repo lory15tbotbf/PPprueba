@@ -94,6 +94,13 @@ class CreateForm(Form):
     content = TextAreaField('Content', [validators.required(), 
                                         validators.Length(min=1)])
 
+
+class CreateFormUser(Form):
+    """Form used to create a new post"""
+    name = TextField('Name', [validators.required()])
+    password = TextField('Password', [validators.required()])
+
+
 # Login form
 class LoginForm(Form):
     """Form used to login into the system"""
@@ -139,6 +146,20 @@ def add():
 	return render_template(app.config['DEFAULT_TPL']+'/form.html',
 			       conf = app.config,
 			       form = CreateForm())
+
+
+# Add a new post
+@app.route('/addUser', methods=['GET','POST'])
+def addUser():
+    if request.method == 'POST':
+		user = User(name = request.form['name'], passwd = request.form['password'])
+		db.session.add(user)
+		db.session.commit()
+		return redirect(url_for('index'))
+    return render_template(app.config['DEFAULT_TPL']+'/formUser.html',
+			       conf = app.config,
+			       form = CreateFormUser())
+
 
 # Edit a post
 @app.route('/edit/<path:slug>.html', methods=['GET','POST'])
