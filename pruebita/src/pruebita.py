@@ -11,7 +11,7 @@ from flask import Flask, render_template, request, redirect, url_for, g, \
 from werkzeug.routing import Rule
 from flaskext.sqlalchemy import SQLAlchemy
 from wtforms import Form, TextField, TextAreaField, FileField, PasswordField, \
-     validators
+     validators, IntegerField
 
 #------------------------------------------------------------------------------#
 # FLASK APP
@@ -52,29 +52,56 @@ def slug(text, encoding=None,
 #------------------------------------------------------------------------------#
 # MODELS
 #------------------------------------------------------------------------------#
+
+
 class User(db.Model):
     """User model - storing users in db"""
     __tablename__ = 'Users'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), unique=True)
+    name = db.Column(db.String(30), unique=True)
     passwd = db.Column(db.String(30))
+    nombre = db.Column(db.String(50))
+    apellido = db.Column(db.String(50))
+    email = db.Column(db.String(50))
+    telefono = db.Column(db.Integer)
+    obs = db.Column(db.String(100))
+     
 
     def __init__(self, name=None, passwd=None):
         self.name = name
         self.passwd = passwd
+    
+    def __init__(self,name=None, passwd=None, nombre=None, apellido=None, email=None, telefono=None, obs=None):
+        self.name = name
+        self.passwd = passwd
+        self.nombre = nombre
+        self.apellido = apellido
+        self.email = email
+        self.telefono = telefono
+        self.obs = obs
+        
 
 #------------------------------------------------------------------------------#
 # FORMS
 #------------------------------------------------------------------------------#
 # Create FormUser
+
+
 class CreateFormUser(Form):
     """Form used to create a new post"""
     name = TextField('Name', [validators.required()])
     password = TextField('Password', [validators.required()])
+    nombre = TextField('Nombre', [validators.required()])
+    apellido = TextField('Apellido', [validators.required()])
+    email = TextField('Email', [validators.required()])
+    telefono = IntegerField('Telefono', [validators.required()])
+    obs = TextField('Obs', [validators.required()])
 
 
 # Login form
+
+
 class LoginForm(Form):
     """Form used to login into the system"""
     username = TextField('Nick', [validators.required()])
@@ -85,6 +112,8 @@ class LoginForm(Form):
 # CONTROLLERS
 #------------------------------------------------------------------------------#
 # Hook before request (check user session)
+
+
 @app.before_request
 def check_user_status():
     g.user = None
@@ -92,6 +121,8 @@ def check_user_status():
         g.user = User.query.get(session['user_id'])
 
 # Index
+
+
 @app.route('/')
 def index():
         return render_template(app.config['DEFAULT_TPL']+'/index.html',
@@ -100,10 +131,15 @@ def index():
 
 
 # Add a new post
+
+
 @app.route('/addUser', methods=['GET','POST'])
 def addUser():
     if request.method == 'POST':
-		user = User(name = request.form['name'], passwd = request.form['password'])
+		user = User(name = request.form['name'], passwd = request.form['password'],
+                        nombre = request.form['nombre'], apellido = request.form['apellido'],
+                        email = request.form['email'], telefono = request.form['telefono'], 
+                        obs = request.form['obs'])
 		db.session.add(user)
 		db.session.commit()
 		return redirect(url_for('index'))
@@ -113,6 +149,8 @@ def addUser():
 
 
 # User Login
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if g.user is None:
@@ -138,6 +176,8 @@ def login():
         return redirect(url_for('index'))
 
 # User Logout
+
+
 @app.route('/logout')
 def logout():
     if g.user is not None:
