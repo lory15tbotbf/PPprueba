@@ -13,6 +13,7 @@ from flaskext.sqlalchemy import SQLAlchemy
 from wtforms import Form, TextField, TextAreaField, FileField, PasswordField, \
      validators, IntegerField
 
+global nombre
 #------------------------------------------------------------------------------#
 # FLASK APP
 #------------------------------------------------------------------------------#
@@ -130,6 +131,20 @@ def index():
 			    users = User.query.order_by(User.name.desc()).all(),)
 
 
+#Admin
+@app.route('/admin', methods=['GET','POST'])
+def admin():
+     return render_template(app.config['DEFAULT_TPL']+'/admin.html',
+			    conf = app.config,)
+                            
+# listar usuarios
+@app.route('/list', methods=['GET','POST'])
+def list():
+     return render_template(app.config['DEFAULT_TPL']+'/list.html',
+                           conf = app.config,
+                           list = User.query.all(),)                            
+
+
 # Add a new post
 
 
@@ -142,7 +157,8 @@ def addUser():
                         obs = request.form['obs'])
 		db.session.add(user)
 		db.session.commit()
-		return redirect(url_for('index'))
+                flash('Se ha creado correctamente el usuario')
+		return redirect(url_for('admin'))
     return render_template(app.config['DEFAULT_TPL']+'/formUser.html',
 			       conf = app.config,
 			       form = CreateFormUser())
@@ -174,6 +190,27 @@ def login():
                                error = error)
     else:
         return redirect(url_for('index'))
+
+
+# borrar usuario
+@app.route('/deleteUser/<path:nombre>.html')
+def deleteUser(nombre):
+        user = User.query.filter(User.name == nombre).first_or_404()
+        db.session.delete(user)
+        db.session.commit()
+        flash('Se ha borrado correctamente')
+        return redirect(url_for('admin'))
+
+#lista de usuarios a borrar
+@app.route('/listdelete')
+def listdelete():
+    if g.user is None:
+        return redirect(url_for('login'))
+    else:
+        return render_template(app.config['DEFAULT_TPL']+'/delete.html',
+                           conf = app.config,
+                           list = User.query.all(),)  
+
 
 # User Logout
 

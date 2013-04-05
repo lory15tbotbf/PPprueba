@@ -7,10 +7,10 @@
     <form method="post" action="">
       <dl>
         {{ form.csrf }}
-        {{ form.name.label(style="float: left; width: 100px;") }} 
+            {{ form.name.label(style="float: left; width: 100px;") }} 
             {{ form.name(class="form-input", style="width:100px") }}
             {% for error in form.name.errors %} {{ error }} {% endfor %}
-		<br />
+	    <br />
             {{ form.password.label(style="float: left; width: 100px;") }}
             {{form.password(class="form-input", style="width:100px") }}
             {% for error in form.password.errors %} {{ error }} {% endfor %}
