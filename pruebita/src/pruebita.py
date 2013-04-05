@@ -66,7 +66,8 @@ class User(db.Model):
     apellido = db.Column(db.String(50))
     email = db.Column(db.String(50))
     telefono = db.Column(db.Integer)
-    obs = db.Column(db.String(100))
+    obs = db.Column(db.String(150))
+    status = db.Column(db.String(20), default = 'inactivo')
      
 
     def __init__(self, name=None, passwd=None):
@@ -98,6 +99,7 @@ class CreateFormUser(Form):
     email = TextField('Email', [validators.required()])
     telefono = IntegerField('Telefono', [validators.required()])
     obs = TextField('Obs', [validators.required()])
+    
 
 
 # Login form
