@@ -11,7 +11,7 @@ from flask import Flask, render_template, request, redirect, url_for, g, \
 from werkzeug.routing import Rule
 from flaskext.sqlalchemy import SQLAlchemy
 from wtforms import Form, TextField, TextAreaField, FileField, PasswordField, \
-     validators, IntegerField
+     validators, IntegerField, SelectField, SubmitField
 
 global nombre
 #------------------------------------------------------------------------------#
@@ -51,7 +51,7 @@ class User(db.Model):
     email = db.Column(db.String(50))
     telefono = db.Column(db.Integer)
     obs = db.Column(db.String(150))
-    status = db.Column(db.String(20), default = 'inactivo')
+    estado = db.Column(db.String(20), default = 'Inactivo')
      
 
     def __init__(self, name=None, passwd=None):
@@ -94,6 +94,13 @@ class LoginForm(Form):
     username = TextField('Nick', [validators.required()])
     password = PasswordField('Password', [validators.required()])
 
+# Edit Status
+
+class EditStateForm(Form):
+    estado = SelectField("Estado", choices = [
+        ("Activo", "Activo"),
+        ("Inactivo", "Inactivo")])
+    submit = SubmitField("POST")
 
 #------------------------------------------------------------------------------#
 # CONTROLLERS
@@ -191,6 +198,32 @@ def listDelete():
                            conf = app.config,
                            list = User.query.all(),)  
 
+
+#lista de usuarios a editar usuario
+@app.route('/listState')
+def listState():
+    if g.user is None:
+        return redirect(url_for('login'))
+    else:
+        return render_template(app.config['DEFAULT_TPL']+'/listState.html',
+                           conf = app.config,
+                           list = User.query.all(),) 
+                           
+# Edit a post
+@app.route('/edit/<path:nombre>.html', methods=['GET','POST'])
+def editState(nombre):
+    if g.user is None:
+        return redirect(url_for('login'))
+    else:
+        user = User.query.filter(User.name == nombre).first_or_404()
+        form = EditStateForm(request.form, level = user.estado)
+	if request.method == 'POST' and form.validate():
+                user.estado = request.form['estado']
+                db.session.commit()
+		return redirect(url_for('admin'))
+	return render_template(app.config['DEFAULT_TPL']+'/editState.html',
+			       conf = app.config,
+			       form = EditStateForm())
 
 
 @app.route('/logout')
