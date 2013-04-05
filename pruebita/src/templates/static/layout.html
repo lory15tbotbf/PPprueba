@@ -31,9 +31,10 @@
 				{% if not g.user %}
                 <li><a href="{{ url_for('login') }}">Login</a></li>
 				{% else %}
-                <li><a href="{{ url_for('addUser') }}">Admin</a></li>
-                <li><a href="{{ url_for('add') }}">Gestion</a></li>
-                <li><a href="{{ url_for('add') }}">Desarrollo</a></li>
+                <li><a href="{{ url_for('addUser') }}">Agregar Usuario</a></li>
+                <li><a href="{{ url_for('addUser') }}">Eliminar Usuario</a></li>
+                <li><a href="{{ url_for('addUser') }}">Modificar Usuario</a></li>
+                <li><a href="{{ url_for('addUser') }}">Actualizar Estado de Usuario</a></li>
                 <li><a href="{{ url_for('logout') }}">Logout</a></li>
                 		{% endif %}
             </ul>
@@ -53,9 +54,10 @@
 						{% if not g.user %}
                         <li><a href="{{ url_for('login') }}">Login</a></li>
 						{% else %}
-                        <li><a href="{{ url_for('addUser') }}">Admin</a></li>
-                        <li><a href="{{ url_for('add') }}">Gestion</a></li>
-                        <li><a href="{{ url_for('add') }}">Desarrollo</a></li>
+                        <li><a href="{{ url_for('addUser') }}">Agregar Usuario</a></li>
+                        <li><a href="{{ url_for('addUser') }}">Eliminar Usuario</a></li>
+                        <li><a href="{{ url_for('addUser') }}">Modificar Usuario</a></li>
+                        <li><a href="{{ url_for('addUser') }}">Actualizar Estado de Usuario</a></li>
                         <li><a href="{{ url_for('logout') }}">Logout</a></li>
                         			{% endif %}
                     </ul>

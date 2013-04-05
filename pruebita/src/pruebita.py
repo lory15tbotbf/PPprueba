@@ -94,7 +94,7 @@ class CreateForm(Form):
     content = TextAreaField('Content', [validators.required(), 
                                         validators.Length(min=1)])
 
-
+# Create FormUser
 class CreateFormUser(Form):
     """Form used to create a new post"""
     name = TextField('Name', [validators.required()])
