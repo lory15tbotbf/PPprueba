@@ -52,26 +52,6 @@ def slug(text, encoding=None,
 #------------------------------------------------------------------------------#
 # MODELS
 #------------------------------------------------------------------------------#
-# Model
-class Post(db.Model):
-    """Post model - storing posts in db"""
-    __tablename__ = 'Posts'
-    __mapper_args__ = dict(order_by="date desc")
-
-    id = db.Column(db.Integer, primary_key=True)
-    subject = db.Column(db.Unicode(255))
-    slug = db.Column(db.Unicode(255))
-    author = db.Column(db.Integer)
-    date = db.Column(db.DateTime())
-    content = db.Column(db.Text())
-
-    def __init__(self, subject, content):
-        self.subject = subject
-        self.slug = slug(subject)
-        self.content = content
-        self.author = g.user.id
-        self.date = datetime.utcnow()
-
 class User(db.Model):
     """User model - storing users in db"""
     __tablename__ = 'Users'
@@ -87,13 +67,6 @@ class User(db.Model):
 #------------------------------------------------------------------------------#
 # FORMS
 #------------------------------------------------------------------------------#
-# Create Form
-class CreateForm(Form):
-    """Form used to create a new post"""
-    subject = TextField('Subject', [validators.required()])
-    content = TextAreaField('Content', [validators.required(), 
-                                        validators.Length(min=1)])
-
 # Create FormUser
 class CreateFormUser(Form):
     """Form used to create a new post"""
@@ -123,29 +96,7 @@ def check_user_status():
 def index():
         return render_template(app.config['DEFAULT_TPL']+'/index.html',
 			    conf = app.config,
-			    posts = Post.query.order_by(Post.date.desc()).all(),)
-
-# Post detail
-@app.route('/<path:slug>.html')
-def post(slug):
-        return render_template(app.config['DEFAULT_TPL']+'/post.html',
-			    conf = app.config,
-			    post = Post.query.filter(Post.slug == slug).first_or_404())
-
-# Add a new post
-@app.route('/add', methods=['GET','POST'])
-def add():
-    if g.user is None:
-        return redirect(url_for('login'))
-    else:
-	if request.method == 'POST':
-		post = Post(request.form['subject'], request.form['content'])
-		db.session.add(post)
-		db.session.commit()
-		return redirect(url_for('index'))
-	return render_template(app.config['DEFAULT_TPL']+'/form.html',
-			       conf = app.config,
-			       form = CreateForm())
+			    users = User.query.order_by(User.name.desc()).all(),)
 
 
 # Add a new post
@@ -160,34 +111,6 @@ def addUser():
 			       conf = app.config,
 			       form = CreateFormUser())
 
-
-# Edit a post
-@app.route('/edit/<path:slug>.html', methods=['GET','POST'])
-def edit(slug):
-    if g.user is None:
-        return redirect(url_for('login'))
-    else:
-        post = Post.query.filter(Post.slug == slug).first_or_404()
-        form = CreateForm(request.form, subject=post.subject, content=post.content)
-	if request.method == 'POST' and form.validate():
-                post.subject = request.form['subject']
-                post.content = request.form['content']
-		db.session.commit()
-		return redirect(url_for('index'))
-	return render_template(app.config['DEFAULT_TPL']+'/form.html',
-			       conf = app.config,
-			       form = form)
-
-@app.route('/delete/<path:slug>.html')
-def delete(slug):
-    if g.user is None:
-        return redirect(url_for('login'))
-    else:
-        post = Post.query.filter(Post.slug == slug).first_or_404()
-        db.session.delete(post)
-        db.session.commit()
-        return redirect(url_for('index'))
-    
 
 # User Login
 @app.route('/login', methods=['GET', 'POST'])

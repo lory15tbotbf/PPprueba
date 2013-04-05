@@ -7,22 +7,22 @@ manager = Manager(app)
 
 @manager.command
 def initdb():
-    print """Creates all database tables."""
     db.create_all()
+    """Creo database"""
 
 @manager.option('-u','--user', dest='user', default='admin', help='Username')
 @manager.option('-p','--password', dest='password', default='password', help='Password')
 def create_user(user, password):
-    print """Creates the admin user."""
     from pruebita import User
     u=User(user, password)
     db.session.add(u)
     db.session.commit()
+    """Creo el usuario: user""" 
 
 @manager.command
 def dropdb():
-    print """Drops all database tables."""
     db.drop_all()
+    """Elimino database."""
 
 if __name__ == '__main__':
     manager.run()
