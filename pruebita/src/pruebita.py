@@ -33,22 +33,6 @@ app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
         app.config['DEFAULT_TPL'])
 })
 
-#------------------------------------------------------------------------------#
-# FUNCTIONS
-#------------------------------------------------------------------------------#
-from unicodedata import normalize
-
-# Slug (https://gist.github.com/1428479)
-def slug(text, encoding=None,
-         permitted_chars='abcdefghijklmnopqrstuvwxyz0123456789-'):
-    if isinstance(text, str):
-        text = text.decode(encoding or 'ascii')
-    clean_text = text.strip().replace(' ', '-').lower()
-    while '--' in clean_text:
-        clean_text = clean_text.replace('--', '-')
-    ascii_text = normalize('NFKD', clean_text).encode('ascii', 'ignore')
-    strict_text = map(lambda x: x if x in permitted_chars else '', ascii_text)
-    return unicode(''.join(strict_text))
 
 #------------------------------------------------------------------------------#
 # MODELS
@@ -147,9 +131,6 @@ def list():
                            list = User.query.all(),)                            
 
 
-# Add a new post
-
-
 @app.route('/addUser', methods=['GET','POST'])
 def addUser():
     if request.method == 'POST':
@@ -159,15 +140,12 @@ def addUser():
                         obs = request.form['obs'])
 		db.session.add(user)
 		db.session.commit()
+                
                 flash('Se ha creado correctamente el usuario')
 		return redirect(url_for('admin'))
     return render_template(app.config['DEFAULT_TPL']+'/formUser.html',
 			       conf = app.config,
 			       form = CreateFormUser())
-
-
-# User Login
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -203,9 +181,9 @@ def deleteUser(nombre):
         flash('Se ha borrado correctamente')
         return redirect(url_for('admin'))
 
-#lista de usuarios a borrar
-@app.route('/listdelete')
-def listdelete():
+# lista de usuarios a borrar
+@app.route('/listDelete')
+def listDelete():
     if g.user is None:
         return redirect(url_for('login'))
     else:
@@ -213,8 +191,6 @@ def listdelete():
                            conf = app.config,
                            list = User.query.all(),)  
 
-
-# User Logout
 
 
 @app.route('/logout')
