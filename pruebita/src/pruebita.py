@@ -66,7 +66,7 @@ class User(db.Model):
         self.email = email
         self.telefono = telefono
         self.obs = obs
-        
+    
 
 #------------------------------------------------------------------------------#
 # FORMS
@@ -82,7 +82,7 @@ class CreateFormUser(Form):
     telefono = IntegerField('Telefono', [validators.required()])
     estado = db.Column(db.String(20), default ='inactivo')
     obs = TextField('Obs', [validators.required()])
-    
+
 
 class LoginForm(Form):
     """Form used to login into the system"""
@@ -112,6 +112,12 @@ def index():
         return render_template(app.config['DEFAULT_TPL']+'/index.html',
 			    conf = app.config,
 			    users = User.query.order_by(User.name.desc()).all(),)
+                            
+
+@app.route('/administracion', methods=['GET','POST'])
+def administracion():
+     return render_template(app.config['DEFAULT_TPL']+'/administracion.html',
+			    conf = app.config,)
 
 
 
@@ -121,12 +127,23 @@ def admin():
 			    conf = app.config,)
                             
 
+@app.route('/gestion', methods=['GET','POST'])
+def gestion():
+     return render_template(app.config['DEFAULT_TPL']+'/gestion.html',
+			    conf = app.config,)
+
+@app.route('/rolPermiso', methods=['GET','POST'])
+def rolPermiso():
+     return render_template(app.config['DEFAULT_TPL']+'/rolPermiso.html',
+			    conf = app.config,)
+                            
+
+
 @app.route('/list', methods=['GET','POST'])
 def list():
      return render_template(app.config['DEFAULT_TPL']+'/list.html',
                            conf = app.config,
                            list = User.query.all(),)                            
-
 
 
 
@@ -136,7 +153,7 @@ def addUser():
 		user = User(name = request.form['name'], passwd = request.form['password'],
                 nombre = request.form['nombre'], apellido = request.form['apellido'],
                 email = request.form['email'], telefono = request.form['telefono'], 
-                obs = request.form['obs'])
+                obs = request.form['obs'])    
 		db.session.add(user)
 		db.session.commit()
                 
