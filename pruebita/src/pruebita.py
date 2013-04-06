@@ -71,8 +71,6 @@ class User(db.Model):
 #------------------------------------------------------------------------------#
 # FORMS
 #------------------------------------------------------------------------------#
-# Create FormUser
-
 
 class CreateFormUser(Form):
     """Form used to create a new post"""
@@ -86,15 +84,11 @@ class CreateFormUser(Form):
     obs = TextField('Obs', [validators.required()])
 
 
-# Login form
-
-
 class LoginForm(Form):
     """Form used to login into the system"""
     username = TextField('Nick', [validators.required()])
     password = PasswordField('Password', [validators.required()])
 
-# Edit Status
 
 class EditStateForm(Form):
     estado = SelectField("Estado", choices = [
@@ -105,8 +99,6 @@ class EditStateForm(Form):
 #------------------------------------------------------------------------------#
 # CONTROLLERS
 #------------------------------------------------------------------------------#
-# Hook before request (check user session)
-
 
 @app.before_request
 def check_user_status():
@@ -114,38 +106,36 @@ def check_user_status():
     if 'user_id' in session:
         g.user = User.query.get(session['user_id'])
 
-# Index
+
 @app.route('/')
 def index():
         return render_template(app.config['DEFAULT_TPL']+'/index.html',
 			    conf = app.config,
 			    users = User.query.order_by(User.name.desc()).all(),)
                             
-#Administracion
+
 @app.route('/administracion', methods=['GET','POST'])
 def administracion():
      return render_template(app.config['DEFAULT_TPL']+'/administracion.html',
 			    conf = app.config,)
 
 
-#Admin
 @app.route('/admin', methods=['GET','POST'])
 def admin():
      return render_template(app.config['DEFAULT_TPL']+'/admin.html',
 			    conf = app.config,)
                             
-#Gestion
 @app.route('/gestion', methods=['GET','POST'])
 def gestion():
      return render_template(app.config['DEFAULT_TPL']+'/gestion.html',
 			    conf = app.config,)
-#Roles y Permisos
+
 @app.route('/rolPermiso', methods=['GET','POST'])
 def rolPermiso():
      return render_template(app.config['DEFAULT_TPL']+'/rolPermiso.html',
 			    conf = app.config,)
                             
-# listar usuarios
+
 @app.route('/list', methods=['GET','POST'])
 def list():
      return render_template(app.config['DEFAULT_TPL']+'/list.html',
@@ -153,7 +143,7 @@ def list():
                            list = User.query.all(),)                            
 
 
-# Add a new post
+
 @app.route('/addUser', methods=['GET','POST'])
 def addUser():
     if request.method == 'POST':
@@ -170,7 +160,7 @@ def addUser():
 			       form = CreateFormUser())
 
 
-# User Login
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if g.user is None:
@@ -196,7 +186,7 @@ def login():
         return redirect(url_for('index'))
 
 
-# borrar usuario
+
 @app.route('/deleteUser/<path:nombre>.html')
 def deleteUser(nombre):
         user = User.query.filter(User.name == nombre).first_or_404()
@@ -205,7 +195,7 @@ def deleteUser(nombre):
         flash('Se ha borrado correctamente')
         return redirect(url_for('admin'))
 
-#lista de usuarios a borrar
+
 @app.route('/listdelete')
 def listdelete():
     if g.user is None:
@@ -215,7 +205,7 @@ def listdelete():
                            conf = app.config,
                            list = User.query.all(),)  
     
-#lista de usuarios a editar usuario
+
 @app.route('/listState')
 def listState():
     if g.user is None:
@@ -225,7 +215,7 @@ def listState():
                            conf = app.config,
                            list = User.query.all(),) 
                            
-# Editar estado de usuario
+
 @app.route('/edit/<path:nombre>.html', methods=['GET','POST'])
 def editState(nombre):
     if g.user is None:
@@ -241,7 +231,7 @@ def editState(nombre):
 			       conf = app.config,
 			       form = EditStateForm())
 
-#lista de usuarios a modificar
+
 @app.route('/listEdit')
 def listEdit():
     if g.user is None:
@@ -251,7 +241,7 @@ def listEdit():
                            conf = app.config,
                            list = User.query.all(),) 
     
-# Editar datos de usuario
+
 @app.route('/editUser/<path:nombre>.html', methods=['GET','POST'])
 def editUser(nombre):
     if g.user is None:
@@ -269,7 +259,7 @@ def editUser(nombre):
             user.apellido = request.form['apellido']
             user.email = request.form['email']
             user.telefono = request.form['telefono'] 
-            obs = request.form['obs']
+            user.obs = request.form['obs']
             db.session.commit()
             flash('Se ha modificado correctamente el usuario')
             return redirect(url_for('admin'))
@@ -277,7 +267,7 @@ def editUser(nombre):
 			       conf = app.config,
 			       form = form)
 
-# User Logout
+
 @app.route('/logout')
 def logout():
     if g.user is not None:
