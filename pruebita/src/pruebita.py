@@ -13,7 +13,6 @@ from flaskext.sqlalchemy import SQLAlchemy
 from wtforms import Form, TextField, TextAreaField, FileField, PasswordField, \
      validators, IntegerField, SelectField, SubmitField
 
-global nombre
 #------------------------------------------------------------------------------#
 # FLASK APP
 #------------------------------------------------------------------------------#
@@ -72,8 +71,6 @@ class User(db.Model):
 #------------------------------------------------------------------------------#
 # FORMS
 #------------------------------------------------------------------------------#
-# Create FormUser
-
 
 class CreateFormUser(Form):
     """ Form used to create a new Usuario"""
@@ -87,14 +84,12 @@ class CreateFormUser(Form):
     obs = TextField('Obs', [validators.required()])
     
 
-
-# Login form
 class LoginForm(Form):
     """Form used to login into the system"""
     username = TextField('Nick', [validators.required()])
     password = PasswordField('Password', [validators.required()])
 
-# Edit Status
+
 class EditStateForm(Form):
     estado = SelectField("Estado", choices = [
         ("Activo", "Activo"),
@@ -104,14 +99,14 @@ class EditStateForm(Form):
 #------------------------------------------------------------------------------#
 # CONTROLLERS
 #------------------------------------------------------------------------------#
-# Hook before request (check user session)
+
 @app.before_request
 def check_user_status():
     g.user = None
     if 'user_id' in session:
         g.user = User.query.get(session['user_id'])
 
-# Index
+
 @app.route('/')
 def index():
         return render_template(app.config['DEFAULT_TPL']+'/index.html',
@@ -119,13 +114,13 @@ def index():
 			    users = User.query.order_by(User.name.desc()).all(),)
 
 
-# Admin
+
 @app.route('/admin', methods=['GET','POST'])
 def admin():
      return render_template(app.config['DEFAULT_TPL']+'/admin.html',
 			    conf = app.config,)
                             
-# Listar usuarios
+
 @app.route('/list', methods=['GET','POST'])
 def list():
      return render_template(app.config['DEFAULT_TPL']+'/list.html',
@@ -134,7 +129,7 @@ def list():
 
 
 
-# Add nuevo usuario
+
 @app.route('/addUser', methods=['GET','POST'])
 def addUser():
     if request.method == 'POST':
@@ -151,7 +146,7 @@ def addUser():
 			       conf = app.config,
 			       form = CreateFormUser())
 
-# User Login
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if g.user is None:
@@ -177,7 +172,7 @@ def login():
         return redirect(url_for('index'))
 
 
-# borrar usuario
+
 @app.route('/deleteUser/<path:nombre>.html')
 def deleteUser(nombre):
         user = User.query.filter(User.name == nombre).first_or_404()
@@ -186,7 +181,7 @@ def deleteUser(nombre):
         flash('Se ha borrado correctamente')
         return redirect(url_for('admin'))
 
-# lista de usuarios a borrar
+
 @app.route('/listDelete')
 def listDelete():
     if g.user is None:
@@ -196,7 +191,7 @@ def listDelete():
                            conf = app.config,
                            list = User.query.all(),)  
     
-# lista de usuarios para editar estado
+
 @app.route('/listState')
 def listState():
     if g.user is None:
@@ -206,7 +201,7 @@ def listState():
                            conf = app.config,
                            list = User.query.all(),) 
                            
-# Editar estado de usuario
+
 @app.route('/edit/<path:nombre>.html', methods=['GET','POST'])
 def editState(nombre):
     if g.user is None:
@@ -222,7 +217,6 @@ def editState(nombre):
 			       conf = app.config,
 			       form = EditStateForm())
 
-# Lista de usuarios a modificar
 @app.route('/listEdit')
 def listEdit():
     if g.user is None:
@@ -231,8 +225,7 @@ def listEdit():
         return render_template(app.config['DEFAULT_TPL']+'/listEdit.html',
                            conf = app.config,
                            list = User.query.all(),) 
-    
-# Editar datos de usuario
+
 @app.route('/editUser/<path:nombre>.html', methods=['GET','POST'])
 def editUser(nombre):
     if g.user is None:
@@ -257,8 +250,6 @@ def editUser(nombre):
 	return render_template(app.config['DEFAULT_TPL']+'/editUser.html',
 			       conf = app.config,
 			       form = form)
-
-# User Logout
 
 @app.route('/logout')
 def logout():
