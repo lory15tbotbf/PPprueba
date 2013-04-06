@@ -1,10 +1,10 @@
 {% extends "static/layout.html" %}
 
-{% block title %}List State{% endblock %}
+{% block title %}List User{% endblock %}
 
 {% block body %}
     <div class="page-header">
-    <h3>Elija el usuario a editar su estado</h3>
+    <h3>Elija el usuario a editar sus datos</h3>
 </div>
 
 <ul class="users">
@@ -12,7 +12,7 @@
     <li class="span3">
         <div class="well well-small user">
             <div class="text">
-                <a href="{{ url_for('editState', nombre = user.name )}}"<h5>{{ user.name }}</h5></a>
+                <a href="{{ url_for('editUser', nombre = user.name )}}"<h5>{{ user.name }}</h5></a>
             </div>
         </div>
     </li>
