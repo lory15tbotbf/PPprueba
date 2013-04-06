@@ -66,7 +66,7 @@ class User(db.Model):
         self.email = email
         self.telefono = telefono
         self.obs = obs
-        
+    
 
 #------------------------------------------------------------------------------#
 # FORMS
@@ -120,12 +120,29 @@ def index():
         return render_template(app.config['DEFAULT_TPL']+'/index.html',
 			    conf = app.config,
 			    users = User.query.order_by(User.name.desc()).all(),)
+                            
+#Administracion
+@app.route('/administracion', methods=['GET','POST'])
+def administracion():
+     return render_template(app.config['DEFAULT_TPL']+'/administracion.html',
+			    conf = app.config,)
 
 
 #Admin
 @app.route('/admin', methods=['GET','POST'])
 def admin():
      return render_template(app.config['DEFAULT_TPL']+'/admin.html',
+			    conf = app.config,)
+                            
+#Gestion
+@app.route('/gestion', methods=['GET','POST'])
+def gestion():
+     return render_template(app.config['DEFAULT_TPL']+'/gestion.html',
+			    conf = app.config,)
+#Roles y Permisos
+@app.route('/rolPermiso', methods=['GET','POST'])
+def rolPermiso():
+     return render_template(app.config['DEFAULT_TPL']+'/rolPermiso.html',
 			    conf = app.config,)
                             
 # listar usuarios
