@@ -40,7 +40,7 @@ app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
 
 
 class User(db.Model):
-    """User model - storing users in db"""
+    """ Modelo de Usuario """
     __tablename__ = 'Users'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -76,7 +76,7 @@ class User(db.Model):
 
 
 class CreateFormUser(Form):
-    """Form used to create a new post"""
+    """ Form used to create a new Usuario"""
     name = TextField('Name', [validators.required()])
     password = TextField('Password', [validators.required()])
     nombre = TextField('Nombre', [validators.required()])
@@ -89,15 +89,12 @@ class CreateFormUser(Form):
 
 
 # Login form
-
-
 class LoginForm(Form):
     """Form used to login into the system"""
     username = TextField('Nick', [validators.required()])
     password = PasswordField('Password', [validators.required()])
 
 # Edit Status
-
 class EditStateForm(Form):
     estado = SelectField("Estado", choices = [
         ("Activo", "Activo"),
@@ -108,8 +105,6 @@ class EditStateForm(Form):
 # CONTROLLERS
 #------------------------------------------------------------------------------#
 # Hook before request (check user session)
-
-
 @app.before_request
 def check_user_status():
     g.user = None
@@ -124,13 +119,13 @@ def index():
 			    users = User.query.order_by(User.name.desc()).all(),)
 
 
-#Admin
+# Admin
 @app.route('/admin', methods=['GET','POST'])
 def admin():
      return render_template(app.config['DEFAULT_TPL']+'/admin.html',
 			    conf = app.config,)
                             
-# listar usuarios
+# Listar usuarios
 @app.route('/list', methods=['GET','POST'])
 def list():
      return render_template(app.config['DEFAULT_TPL']+'/list.html',
@@ -139,7 +134,7 @@ def list():
 
 
 
-# Add a new post
+# Add nuevo usuario
 @app.route('/addUser', methods=['GET','POST'])
 def addUser():
     if request.method == 'POST':
@@ -201,7 +196,7 @@ def listDelete():
                            conf = app.config,
                            list = User.query.all(),)  
     
-#lista de usuarios a editar usuario
+# lista de usuarios para editar estado
 @app.route('/listState')
 def listState():
     if g.user is None:
@@ -227,7 +222,7 @@ def editState(nombre):
 			       conf = app.config,
 			       form = EditStateForm())
 
-#lista de usuarios a modificar
+# Lista de usuarios a modificar
 @app.route('/listEdit')
 def listEdit():
     if g.user is None:
@@ -255,42 +250,13 @@ def editUser(nombre):
             user.apellido = request.form['apellido']
             user.email = request.form['email']
             user.telefono = request.form['telefono'] 
-            obs = request.form['obs']
+            user.obs = request.form['obs']
             db.session.commit()
             flash('Se ha modificado correctamente el usuario')
             return redirect(url_for('admin'))
 	return render_template(app.config['DEFAULT_TPL']+'/editUser.html',
 			       conf = app.config,
 			       form = form)
-
-
-#lista de usuarios a editar usuario
-@app.route('/listState')
-def listState():
-    if g.user is None:
-        return redirect(url_for('login'))
-    else:
-        return render_template(app.config['DEFAULT_TPL']+'/listState.html',
-                           conf = app.config,
-                           list = User.query.all(),) 
-                           
-# Edit a post
-@app.route('/edit/<path:nombre>.html', methods=['GET','POST'])
-def editState(nombre):
-    if g.user is None:
-        return redirect(url_for('login'))
-    else:
-        user = User.query.filter(User.name == nombre).first_or_404()
-        form = EditStateForm(request.form, level = user.estado)
-	if request.method == 'POST' and form.validate():
-                user.estado = request.form['estado']
-                db.session.commit()
-		return redirect(url_for('admin'))
-	return render_template(app.config['DEFAULT_TPL']+'/editState.html',
-			       conf = app.config,
-			       form = EditStateForm())
-
-
 
 # User Logout
 

@@ -7,8 +7,9 @@ manager = Manager(app)
 
 @manager.command
 def initdb():
-    db.create_all()
     """Creo database"""
+    db.create_all()
+
 
 @manager.option('-u','--user', dest='user', default='admin', help='Username')
 @manager.option('-p','--password', dest='password', default='password', help='Password')
@@ -18,16 +19,18 @@ def initdb():
 @manager.option('-t','--telefono', dest='telefono', default='telefono', help='Telefono')
 @manager.option('-o','--obs', dest='obs', default='obs', help='Obs')
 def create_user(user, password, nombre, apellido, email, telefono, obs):
+    """Creo el usuario: user""" 
     from pruebita import User
     u=User(user, password, nombre, apellido, email,telefono, obs)
     db.session.add(u)
     db.session.commit()
-    """Creo el usuario: user""" 
+   
 
 @manager.command
 def dropdb():
+    """Elimino la base de datos."""
     db.drop_all()
-    """Elimino database."""
+    
 
 if __name__ == '__main__':
     manager.run()
