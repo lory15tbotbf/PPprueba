@@ -160,7 +160,7 @@ def addUser():
 		user = User(name = request.form['name'], passwd = request.form['password'],
                 nombre = request.form['nombre'], apellido = request.form['apellido'],
                 email = request.form['email'], telefono = request.form['telefono'], 
-                obs = request.form['obs'])
+                obs = request.form['obs'])    
 		db.session.add(user)
 		db.session.commit()
                 flash('Se ha creado correctamente el usuario')
