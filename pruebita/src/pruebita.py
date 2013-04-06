@@ -13,7 +13,6 @@ from flaskext.sqlalchemy import SQLAlchemy
 from wtforms import Form, TextField, TextAreaField, FileField, PasswordField, \
      validators, IntegerField, SelectField, SubmitField
 
-global nombre
 #------------------------------------------------------------------------------#
 # FLASK APP
 #------------------------------------------------------------------------------#
@@ -40,7 +39,7 @@ app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
 
 
 class User(db.Model):
-    """User model - storing users in db"""
+    """ Modelo de Usuario """
     __tablename__ = 'Users'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -52,6 +51,7 @@ class User(db.Model):
     telefono = db.Column(db.Integer)
     obs = db.Column(db.String(100))
     estado = db.Column(db.String(20), default ='Inactivo')
+
      
 
     def __init__(self, name=None, passwd=None):
@@ -73,7 +73,7 @@ class User(db.Model):
 #------------------------------------------------------------------------------#
 
 class CreateFormUser(Form):
-    """Form used to create a new post"""
+    """ Form used to create a new Usuario"""
     name = TextField('Name', [validators.required()])
     password = TextField('Password', [validators.required()])
     nombre = TextField('Nombre', [validators.required()])
@@ -120,10 +120,12 @@ def administracion():
 			    conf = app.config,)
 
 
+
 @app.route('/admin', methods=['GET','POST'])
 def admin():
      return render_template(app.config['DEFAULT_TPL']+'/admin.html',
 			    conf = app.config,)
+                            
                             
 @app.route('/gestion', methods=['GET','POST'])
 def gestion():
@@ -135,6 +137,18 @@ def rolPermiso():
      return render_template(app.config['DEFAULT_TPL']+'/rolPermiso.html',
 			    conf = app.config,)
                             
+
+@app.route('/gestion', methods=['GET','POST'])
+def gestion():
+     return render_template(app.config['DEFAULT_TPL']+'/gestion.html',
+			    conf = app.config,)
+
+@app.route('/rolPermiso', methods=['GET','POST'])
+def rolPermiso():
+     return render_template(app.config['DEFAULT_TPL']+'/rolPermiso.html',
+			    conf = app.config,)
+                            
+
 
 @app.route('/list', methods=['GET','POST'])
 def list():
@@ -153,6 +167,7 @@ def addUser():
                 obs = request.form['obs'])    
 		db.session.add(user)
 		db.session.commit()
+                
                 flash('Se ha creado correctamente el usuario')
 		return redirect(url_for('admin'))
     return render_template(app.config['DEFAULT_TPL']+'/formUser.html',
@@ -240,7 +255,7 @@ def listEdit():
         return render_template(app.config['DEFAULT_TPL']+'/listEdit.html',
                            conf = app.config,
                            list = User.query.all(),) 
-    
+
 
 @app.route('/editUser/<path:nombre>.html', methods=['GET','POST'])
 def editUser(nombre):

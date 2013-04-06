@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 __author__="lory"
 __date__ ="$06/04/2013 12:26:37 AM$"
+=======
+__author__="silvana"
+__date__ ="$06/04/2013 02:18:00 AM$"
+>>>>>>> origin/master
 
 from setuptools import setup,find_packages
 
