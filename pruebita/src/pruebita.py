@@ -11,7 +11,7 @@ from flask import Flask, render_template, request, redirect, url_for, g, \
 from werkzeug.routing import Rule
 from flaskext.sqlalchemy import SQLAlchemy
 from wtforms import Form, TextField, TextAreaField, FileField, PasswordField, \
-     validators, IntegerField
+     validators, IntegerField, SelectField, SubmitField
 
 global nombre
 #------------------------------------------------------------------------------#
@@ -33,22 +33,6 @@ app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
         app.config['DEFAULT_TPL'])
 })
 
-#------------------------------------------------------------------------------#
-# FUNCTIONS
-#------------------------------------------------------------------------------#
-from unicodedata import normalize
-
-# Slug (https://gist.github.com/1428479)
-def slug(text, encoding=None,
-         permitted_chars='abcdefghijklmnopqrstuvwxyz0123456789-'):
-    if isinstance(text, str):
-        text = text.decode(encoding or 'ascii')
-    clean_text = text.strip().replace(' ', '-').lower()
-    while '--' in clean_text:
-        clean_text = clean_text.replace('--', '-')
-    ascii_text = normalize('NFKD', clean_text).encode('ascii', 'ignore')
-    strict_text = map(lambda x: x if x in permitted_chars else '', ascii_text)
-    return unicode(''.join(strict_text))
 
 #------------------------------------------------------------------------------#
 # MODELS
@@ -67,6 +51,7 @@ class User(db.Model):
     email = db.Column(db.String(50))
     telefono = db.Column(db.Integer)
     obs = db.Column(db.String(100))
+    estado = db.Column(db.String(20), default ='Inactivo')
      
 
     def __init__(self, name=None, passwd=None):
@@ -97,6 +82,7 @@ class CreateFormUser(Form):
     apellido = TextField('Apellido', [validators.required()])
     email = TextField('Email', [validators.required()])
     telefono = IntegerField('Telefono', [validators.required()])
+    estado = db.Column(db.String(20), default ='inactivo')
     obs = TextField('Obs', [validators.required()])
 
 
@@ -108,7 +94,14 @@ class LoginForm(Form):
     username = TextField('Nick', [validators.required()])
     password = PasswordField('Password', [validators.required()])
 
+# Edit Status
 
+class EditStateForm(Form):
+    estado = SelectField("Estado", choices = [
+        ("Activo", "Activo"),
+        ("Inactivo", "Inactivo")])
+    submit = SubmitField("POST")
+    
 #------------------------------------------------------------------------------#
 # CONTROLLERS
 #------------------------------------------------------------------------------#
@@ -122,8 +115,6 @@ def check_user_status():
         g.user = User.query.get(session['user_id'])
 
 # Index
-
-
 @app.route('/')
 def index():
         return render_template(app.config['DEFAULT_TPL']+'/index.html',
@@ -146,15 +137,13 @@ def list():
 
 
 # Add a new post
-
-
 @app.route('/addUser', methods=['GET','POST'])
 def addUser():
     if request.method == 'POST':
 		user = User(name = request.form['name'], passwd = request.form['password'],
-                        nombre = request.form['nombre'], apellido = request.form['apellido'],
-                        email = request.form['email'], telefono = request.form['telefono'], 
-                        obs = request.form['obs'])
+                nombre = request.form['nombre'], apellido = request.form['apellido'],
+                email = request.form['email'], telefono = request.form['telefono'], 
+                obs = request.form['obs'])
 		db.session.add(user)
 		db.session.commit()
                 flash('Se ha creado correctamente el usuario')
@@ -165,8 +154,6 @@ def addUser():
 
 
 # User Login
-
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if g.user is None:
@@ -210,11 +197,70 @@ def listdelete():
         return render_template(app.config['DEFAULT_TPL']+'/delete.html',
                            conf = app.config,
                            list = User.query.all(),)  
+    
+#lista de usuarios a editar usuario
+@app.route('/listState')
+def listState():
+    if g.user is None:
+        return redirect(url_for('login'))
+    else:
+        return render_template(app.config['DEFAULT_TPL']+'/listState.html',
+                           conf = app.config,
+                           list = User.query.all(),) 
+                           
+# Editar estado de usuario
+@app.route('/edit/<path:nombre>.html', methods=['GET','POST'])
+def editState(nombre):
+    if g.user is None:
+        return redirect(url_for('login'))
+    else:
+        user = User.query.filter(User.name == nombre).first_or_404()
+        form = EditStateForm(request.form, estado = user.estado)
+	if request.method == 'POST' and form.validate():
+                user.estado = request.form['estado']
+                db.session.commit()
+		return redirect(url_for('admin'))
+	return render_template(app.config['DEFAULT_TPL']+'/editState.html',
+			       conf = app.config,
+			       form = EditStateForm())
 
+#lista de usuarios a modificar
+@app.route('/listEdit')
+def listEdit():
+    if g.user is None:
+        return redirect(url_for('login'))
+    else:
+        return render_template(app.config['DEFAULT_TPL']+'/listEdit.html',
+                           conf = app.config,
+                           list = User.query.all(),) 
+    
+# Editar datos de usuario
+@app.route('/editUser/<path:nombre>.html', methods=['GET','POST'])
+def editUser(nombre):
+    if g.user is None:
+        return redirect(url_for('login'))
+    else:
+        user = User.query.filter(User.name == nombre).first_or_404()
+        form = CreateFormUser(request.form, name = user.name, 
+               password = user.passwd, nombre = user.nombre,
+               apellido = user.apellido, email = user.email,
+               telefono = user.telefono, obs = user.obs)
+	if request.method == 'POST' and form.validate():
+            user.name = request.form['name']
+            user.passwd = request.form['password']
+            user.nombre = request.form['nombre'] 
+            user.apellido = request.form['apellido']
+            user.email = request.form['email']
+            user.telefono = request.form['telefono'] 
+            obs = request.form['obs']
+            db.session.commit()
+            flash('Se ha modificado correctamente el usuario')
+            return redirect(url_for('admin'))
+	return render_template(app.config['DEFAULT_TPL']+'/editUser.html',
+			       conf = app.config,
+			       form = form)
 
 # User Logout
-
-
 @app.route('/logout')
 def logout():
     if g.user is not None:
